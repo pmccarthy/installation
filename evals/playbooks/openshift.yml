@@ -9,7 +9,7 @@
 #         tasks_from: login
 
 - name: Openshift Sample
-  hosts: localhost
+  hosts: local
   tasks:
     - name: Openshift Login attempt
       shell: oc login https://{{ openshift_master_public_host }} -u {{ openshift_user }} -p {{ openshift_password }} --insecure-skip-tls-verify=true
