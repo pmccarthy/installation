@@ -1,15 +1,9 @@
 ---
-# - hosts: localhost
-#   gather_facts: false
-#   tasks:
-#     -
-#       name: Openshift
-#       include_role:
-#         name: openshift
-#         tasks_from: login
-
-- name: Openshift Sample
-  hosts: local
+- hosts: localhost
+  gather_facts: false
   tasks:
-    - name: Openshift Login attempt
-      shell: oc login https://{{ openshift_master_public_host }} -u {{ openshift_user }} -p {{ openshift_password }} --insecure-skip-tls-verify=true
+    -
+      name: Openshift
+      include_role:
+        name: openshift
+        tasks_from: login
