@@ -7,3 +7,4 @@
       include_role:
         name: openshift
         tasks_from: login
+      when: openshift_login
