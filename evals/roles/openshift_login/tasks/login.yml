@@ -1,0 +1,4 @@
+---
+- name: "Login to Openshift"
+  shell: oc login https://{{ openshift_master_public_host }} -u {{ openshift_user }} -p {{ openshift_password }} --insecure-skip-tls-verify=true
+  when: openshift_login

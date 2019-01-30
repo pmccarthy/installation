@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    -
+      name: Openshift
+      include_role:
+        name: openshift
+        tasks_from: login
+      when: openshift_login
