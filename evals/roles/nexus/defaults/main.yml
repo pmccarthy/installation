@@ -1,2 +1,0 @@
-nexus_namespace: nexus
-nexus_image: sonatype/nexus:{{nexus_version}}

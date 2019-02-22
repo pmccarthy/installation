@@ -1,7 +1,0 @@
----
-
-- name: "Install Required Packages"
-  include_tasks: packages.yml
-  when:
-    - prerequisites_install
-    - prerequisites_install_packages
