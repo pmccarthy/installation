@@ -1,0 +1,10 @@
+---
+- name: "Prerequisite checks"
+  fail:
+    msg: "Variable {{ item }} is undefined"
+  when: (item is not defined) or (item == '')
+  with_items:
+  - "{{ launcher_openshift_sso_route }}"
+  - "{{ launcher_openshift_sso_realm }}"
+  - "{{ launcher_openshift_sso_username }}"
+  - "{{ launcher_openshift_sso_password }}"

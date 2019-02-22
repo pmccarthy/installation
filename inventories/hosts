@@ -1,0 +1,16 @@
+[local:vars]
+ansible_connection=local
+
+[local]
+127.0.0.1
+
+[OSEv3:children]
+master
+
+[OSEv3:vars]
+ansible_user=root
+
+[master]
+integreatly-master-1.openshift.feedhenry.com
+integreatly-master-2.openshift.feedhenry.com
+integreatly-master-3.openshift.feedhenry.com

@@ -1,0 +1,6 @@
+---
+- name: Perform prerequisite checks
+  import_tasks: prereq-check.yml
+
+- name: Provision and Configure Launcher
+  import_tasks: provision-launcher.yml

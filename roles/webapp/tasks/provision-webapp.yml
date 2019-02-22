@@ -1,0 +1,71 @@
+---
+- name: Check if webapp already exists in namespace
+  shell: oc get dc/tutorial-web-app -n {{ webapp_namespace }}
+  register: webapp_exists_cmd
+  failed_when: false
+
+- name: Construct openshift host string
+  shell: echo {{ openshift_master_url }} | cut -d '/' -f3
+  register: openshift_host
+
+- name: Get SSO route
+  shell: oc get route sso -o template --template \{\{.spec.host\}\} -n {{ eval_rhsso_namespace }}
+  register: sso_route
+
+- name: Create WebApp Operator Resources
+  shell: "oc create -f {{ item }} -n {{ webapp_namespace }}"
+  with_items: "{{ webapp_operator_resource_items }}"
+  register: create_webapp_operator_resource_cmd
+  failed_when: create_webapp_operator_resource_cmd.stderr != '' and 'AlreadyExists' not in create_webapp_operator_resource_cmd.stderr
+
+- name: Generate WebApp custom resource template
+  template:
+    src: "cr.yaml.j2"
+    dest: /tmp/webapp-cr.yml
+
+- name: Create WebApp custom resource
+  shell: oc create -f /tmp/webapp-cr.yml -n {{ webapp_namespace }}
+  register: create_webapp_custom_resource_cmd
+  failed_when: create_webapp_custom_resource_cmd.stderr != '' and 'AlreadyExists' not in create_webapp_custom_resource_cmd.stderr
+  changed_when: create_webapp_custom_resource_cmd.rc == 0
+
+- name: Wait for pods
+  shell: sleep 5; oc get pods --namespace {{ webapp_namespace }}  |  grep  "Creating"
+  register: result
+  until: not result.stdout
+  retries: 50
+  delay: 10
+  failed_when: result.stdout
+  changed_when: False
+
+- name: Get webapp secure route
+  shell: oc get route/{{ webapp_route }} -o template --template \{\{.spec.host\}\} -n {{ webapp_namespace }}
+  register: webapp_secure_route
+  retries: 60
+  delay: 5
+  until: webapp_secure_route.rc == 0
+
+- set_fact:
+    webapp_secure_route: "{{ webapp_secure_route.stdout }}"
+
+- add_host:
+    name: WEBAPP_VARS
+    webapp_secure_route: "{{ webapp_secure_route }}"
+
+- name: Create template for OpenShift OAuth client
+  template:
+    src: oauthclient.yaml.j2
+    dest: /tmp/oauthclient.yaml
+
+- name: Check if OpenShift OAuth client already exists
+  shell: oc get oauthclient {{ webapp_client_id }} -n {{ eval_rhsso_namespace }}
+  register: webapp_oauthclient_check_cmd
+  changed_when: false
+  failed_when: false
+
+- name: Remove OpenShift OAuth client
+  shell: oc delete oauthclient {{ webapp_client_id }} -n {{ eval_rhsso_namespace }}
+  when: webapp_oauthclient_check_cmd.rc == 0
+
+- name: Create OpenShift OAuth client
+  shell: oc create -f /tmp/oauthclient.yaml -n {{ eval_rhsso_namespace }}
