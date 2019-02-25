@@ -1,4 +1,20 @@
 ---
+- name: "HERP DERP"
+  shell: "which yq"
+  register: which_yq
+
+- name: "HERPY DERPY"
+  shell: "yq --version"
+  register: yq_version
+
+- debug:
+    var: which_yq
+    verbosity: 2
+
+- debug:
+    var: yq_version
+    verbosity: 2
+
 - name: "get manifest secret from webapp namespace"
   shell: "oc get secret {{ customise_web_console.webapp.secret }} -n {{ eval_webapp_namespace }} -o yaml | yq r - \"data.generated_manifest\" | base64 -d"
   register: manifest
