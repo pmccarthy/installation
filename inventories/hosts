@@ -8,9 +8,7 @@ ansible_connection=local
 master
 
 [OSEv3:vars]
-ansible_user=root
+ansible_user=ec2-user
 
 [master]
-integreatly-master-1.openshift.feedhenry.com
-integreatly-master-2.openshift.feedhenry.com
-integreatly-master-3.openshift.feedhenry.com
+127.0.0.1
